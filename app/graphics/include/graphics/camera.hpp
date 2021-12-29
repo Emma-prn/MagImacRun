@@ -1,10 +1,12 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include <glimac/glm.hpp> 
+
+/*#include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>
+#include <glm/gtx/string_cast.hpp>*/
 
 /*! \class camera
  *  \brief Représente une caméra dans un monde 3D
@@ -28,7 +30,7 @@ class camera {
     glm::mat4 view();
     glm::mat4 projection();
 
-    void move_to(glm::vec3 pos);
+    void move_to(float pos);
     void look_at(glm::vec3 target);
 
     glm::vec3 position();

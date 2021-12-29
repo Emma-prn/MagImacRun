@@ -16,8 +16,8 @@ glm::vec3 camera::position() {
   return eye;
 }
 
-void camera::move_to(glm::vec3 pos) {
-  eye = pos;
+void camera::move_to(float pos) {
+  eye += pos*target;
 }
 
 void camera::look_at(glm::vec3 t) {
@@ -35,7 +35,7 @@ glm::vec3 camera::billboard_normal() {
 
 camera::camera(float near, float far, float fov)
   : eye(0)
-  , target(0)
+  , target(glm::vec3(0.,0.,1.))
   , near(near)
   , far(far)
   , fov(fov)

@@ -13,7 +13,6 @@ private:
     
 public:
     Skybox();
-    GLuint genSkybox();
-    void renderSkybox(GLuint textID);
+    void renderSkybox();
     ~Skybox();
 };

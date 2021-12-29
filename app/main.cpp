@@ -1,12 +1,15 @@
 #include <glimac/SDLWindowManager.hpp>
 #include <glimac/Program.hpp>
 #include <glimac/FilePath.hpp>
-#include <glimac/FreeflyCamera.hpp>
-//#include <glimac/Inputs.hpp>
+#include <glimac/TrackballCamera.hpp>
 #include <GL/glew.h>
 #include <iostream>
-#include "../glimac/src/stb_image.h"
+#include <vector>
 #include <glimac/Skybox.hpp>
+#include <graphics/readFile.hpp>
+#include <graphics/camera.hpp>
+#include <graphics/tile.hpp>
+#include <graphics/wall.hpp>
 
 using namespace glimac;
 
@@ -26,8 +29,9 @@ struct SkyboxProgram {
     }
 };
 
-int width = 800;
-int height = 600;
+float width = 800;
+float height = 600;
+bool isBlocked = false;
 
 int main(int argc, char** argv) {
     // Initialize SDL and open a window
@@ -50,9 +54,10 @@ int main(int argc, char** argv) {
      * HERE SHOULD COME THE INITIALIZATION CODE
      *********************************/
     Skybox sky;
-    GLuint skyTxt = sky.genSkybox();
-    
-    FreeflyCamera cam; 
+    Map parcours = readMap("../assets/map/map.txt", applicationPath);
+    TrackballCamera cam(0.1, 2., 1.); 
+    /*camera cam(70.f,0.1f,100.f);
+    cam.set_screen_dimensions(width,height);*/
 
     // Application loop:
     bool done = false;
@@ -68,36 +73,42 @@ int main(int argc, char** argv) {
                 case SDL_KEYDOWN:
                     switch (e.key.keysym.sym) {
                         case SDLK_z:
-                            std::cout << "touche presse z" << std::endl;
-                            cam.moveFront(0.1f);
                             break;
                         case SDLK_s:
-                            std::cout << "touche presse s" << std::endl;
-                            cam.moveFront(-0.1f);
                             break;
                         case SDLK_q:
-                            std::cout << "touche presse q" << std::endl;
-                            cam.moveLeft(0.1f);
                             break;
                         case SDLK_d:
-                            std::cout << "touche presse d" << std::endl;
-                            cam.moveLeft(-0.1f);
+                            break;
+                        case SDLK_c:
+                            isBlocked = !isBlocked;
                             break;
                         default:
                             break;
                     }
                     break;
                 case SDL_MOUSEMOTION:
-                    case SDL_MOUSEBUTTONDOWN:
-                        switch (e.button.button){
-                            case SDL_BUTTON_LEFT:
-                                cam.rotateUp(float(e.motion.yrel));
-                                cam.rotateLeft(float(e.motion.xrel));
-                                break;
-                            default:
-                                break;
+                    if (SDL_GetMouseState(nullptr,nullptr) & SDL_BUTTON_LMASK && !isBlocked)
+                    {
+                        float camX = float(e.motion.xrel);
+                        float camY = float(e.motion.yrel);
+                        cam.rotateUp(camY);
+                        cam.rotateLeft(camX);
+                        //cam.look_at(glm::vec3(camY,camX,cam.billboard_normal().z));
+                    }
+                    else if (SDL_GetMouseState(nullptr,nullptr) & SDL_BUTTON_MMASK && !isBlocked)
+                    {
+                        if (e.motion.yrel > 0)
+                        {
+                            cam.moveFront(0.1);
+                            //cam.move_to(0.1);
                         }
-                        break;
+                        else if (e.motion.yrel < 0){
+                            cam.moveFront(-0.1);
+                            //cam.move_to(-0.1);
+                        }
+                    }
+                   break;
                 default:
                     break;
             }
@@ -106,23 +117,27 @@ int main(int argc, char** argv) {
         /*********************************
          * HERE SHOULD COME THE RENDERING CODE
          *********************************/
-
         skyboxProgram.m_Program.use();
         glDepthFunc(GL_LEQUAL);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glm::mat4 Projection = glm::perspective(glm::radians(70.f),float(width/height),0.1f,100.f);
-        glm::mat4 View = cam.getViewMatrix();;
+        glm::mat4 View = glm::mat4(glm::mat3(cam.getViewMatrix()));
+
+        /*glm::mat4 Projection = cam.projection();
+        glm::mat4 View = glm::mat4(glm::mat3(cam.view()));*/
 
         glUniformMatrix4fv(skyboxProgram.uVMatrix, 1, GL_FALSE, glm::value_ptr(View));
         glUniformMatrix4fv(skyboxProgram.uPMatrix, 1, GL_FALSE, glm::value_ptr(Projection));
-
-        sky.renderSkybox(skyTxt);
-
+        sky.renderSkybox();
+        glEnable(GL_DEPTH_TEST);
+        for (float i = 0; i < parcours.tiles.size(); i++)
+        {
+            parcours.tiles[i]->draw(cam.getViewMatrix(), Projection);
+        }
         glDepthFunc(GL_LESS);
-
 
         // Update the display
         windowManager.swapBuffers();
     }
-
     return EXIT_SUCCESS;
 }

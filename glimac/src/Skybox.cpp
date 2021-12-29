@@ -4,11 +4,7 @@
 #include <vector>
 #include "stb_image.h"
 
-Skybox::Skybox()
-    :skyboxVAO(0),skyboxVBO(0),skyboxEBO(0),cubeMapText(0)
-{};
-
-GLuint Skybox::genSkybox(){
+Skybox::Skybox(){
     float skyboxVertices[] = {
         -1.0f, -1.0f, 1.0f,
         1.0f, -1.0f, 1.0f,
@@ -50,12 +46,12 @@ GLuint Skybox::genSkybox(){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
     std::string facesCubeMap[6] = {
-        "../assets/textures/sky/posx.jpg",
-        "../assets/textures/sky/negx.jpg",
-        "../assets/textures/sky/posy.jpg",
-        "../assets/textures/sky/negy.jpg",
-        "../assets/textures/sky/posz.jpg",
-        "../assets/textures/sky/negz.jpg"
+        "../assets/textures/sky/test/posx.png",
+        "../assets/textures/sky/test/negx.png",
+        "../assets/textures/sky/test/posy.png",
+        "../assets/textures/sky/test/negy.png",
+        "../assets/textures/sky/test/posz.png",
+        "../assets/textures/sky/test/negz.png"
     };
 
     glGenTextures(1,&cubeMapText);
@@ -82,15 +78,12 @@ GLuint Skybox::genSkybox(){
         }
         
     }
-
-    return cubeMapText;
-
 };
 
-void Skybox::renderSkybox(GLuint textID){
+void Skybox::renderSkybox(){
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textID);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapText);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 }
