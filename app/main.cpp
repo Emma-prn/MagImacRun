@@ -1,33 +1,17 @@
 #include <glimac/SDLWindowManager.hpp>
 #include <glimac/Program.hpp>
 #include <glimac/FilePath.hpp>
-#include <glimac/TrackballCamera.hpp>
+#include <graphics/Cam.hpp>
+#include <graphics/Cam2.hpp> 
 #include <GL/glew.h>
 #include <iostream>
 #include <vector>
+#include <utility>
 #include <glimac/Skybox.hpp>
 #include <graphics/readFile.hpp>
-#include <graphics/camera.hpp>
-#include <graphics/tile.hpp>
-#include <graphics/wall.hpp>
+#include <graphics/crystal.hpp> 
 
 using namespace glimac;
-
-struct SkyboxProgram {
-    Program m_Program;
-
-    GLint uPMatrix;
-    GLint uVMatrix;
-    GLint uSky;
-
-    SkyboxProgram(const FilePath& applicationPath):
-        m_Program(loadProgram(applicationPath.dirPath() + "shaders/skybox.vs.glsl",
-                              applicationPath.dirPath() + "shaders/skybox.fs.glsl")) {
-        uPMatrix = glGetUniformLocation(m_Program.getGLId(), "projection");
-        uVMatrix = glGetUniformLocation(m_Program.getGLId(), "view");
-        uSky = glGetUniformLocation(m_Program.getGLId(), "skybox");
-    }
-};
 
 float width = 800;
 float height = 600;
@@ -48,16 +32,16 @@ int main(int argc, char** argv) {
     std::cout << "GLEW Version : " << glewGetString(GLEW_VERSION) << std::endl;
 
     FilePath applicationPath(argv[0]);
-    SkyboxProgram skyboxProgram(applicationPath);
 
     /*********************************
      * HERE SHOULD COME THE INITIALIZATION CODE
      *********************************/
-    Skybox sky;
-    Map parcours = readMap("../assets/map/map.txt", applicationPath);
-    TrackballCamera cam(0.1, 2., 1.); 
-    /*camera cam(70.f,0.1f,100.f);
-    cam.set_screen_dimensions(width,height);*/
+    Skybox sky(applicationPath);
+    std::pair<Map,geo::Joueur> mapAndJ = readMap("../assets/map/map.txt", applicationPath);
+    CamFPers cam(mapAndJ.second);
+    CamTPers camT;
+    CamA* camP = &camT;
+    Crystal cristal(1, 32, 16,applicationPath); 
 
     // Application loop:
     bool done = false;
@@ -80,8 +64,19 @@ int main(int argc, char** argv) {
                             break;
                         case SDLK_d:
                             break;
-                        case SDLK_c:
+                        case SDLK_l:
                             isBlocked = !isBlocked;
+                            break;
+                        case SDLK_c:
+                            {
+                                if (camP == &camT)
+                                {
+                                    camP = &cam;
+                                }
+                                else {
+                                    camP = &camT;
+                                }
+                            }
                             break;
                         default:
                             break;
@@ -92,20 +87,17 @@ int main(int argc, char** argv) {
                     {
                         float camX = float(e.motion.xrel);
                         float camY = float(e.motion.yrel);
-                        cam.rotateUp(camY);
-                        cam.rotateLeft(camX);
-                        //cam.look_at(glm::vec3(camY,camX,cam.billboard_normal().z));
+                        camP->rotateUp(camY);
+                        camP->rotateLeft(camX);
                     }
-                    else if (SDL_GetMouseState(nullptr,nullptr) & SDL_BUTTON_MMASK && !isBlocked)
+                    else if ((SDL_GetMouseState(nullptr,nullptr) & SDL_BUTTON_MMASK && !isBlocked) && camP == &camT)
                     {
                         if (e.motion.yrel > 0)
                         {
-                            cam.moveFront(0.1);
-                            //cam.move_to(0.1);
+                            camT.moveFront(0.1);
                         }
                         else if (e.motion.yrel < 0){
-                            cam.moveFront(-0.1);
-                            //cam.move_to(-0.1);
+                            camT.moveFront(-0.1);
                         }
                     }
                    break;
@@ -117,25 +109,21 @@ int main(int argc, char** argv) {
         /*********************************
          * HERE SHOULD COME THE RENDERING CODE
          *********************************/
-        skyboxProgram.m_Program.use();
         glDepthFunc(GL_LEQUAL);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glm::mat4 Projection = glm::perspective(glm::radians(70.f),float(width/height),0.1f,100.f);
-        glm::mat4 View = glm::mat4(glm::mat3(cam.getViewMatrix()));
+        glm::mat4 View = glm::mat4(glm::mat3(camP->getViewMatrix(mapAndJ.second)));
+        View = glm::scale(View, glm::vec3(0.2,0.2,0.2));
 
-        /*glm::mat4 Projection = cam.projection();
-        glm::mat4 View = glm::mat4(glm::mat3(cam.view()));*/
-
-        glUniformMatrix4fv(skyboxProgram.uVMatrix, 1, GL_FALSE, glm::value_ptr(View));
-        glUniformMatrix4fv(skyboxProgram.uPMatrix, 1, GL_FALSE, glm::value_ptr(Projection));
-        sky.renderSkybox();
+        sky.renderSkybox(View,Projection);
         glEnable(GL_DEPTH_TEST);
-        for (float i = 0; i < parcours.tiles.size(); i++)
+        for (float i = 0; i < mapAndJ.first.tiles.size(); i++)
         {
-            parcours.tiles[i]->draw(cam.getViewMatrix(), Projection);
+            mapAndJ.first.tiles[i]->draw(camP->getViewMatrix(mapAndJ.second), Projection);
         }
+        //mapAndJ.second.move();
+        //cristal.crystalDraw(View, Projection, windowManager);
         glDepthFunc(GL_LESS);
-
         // Update the display
         windowManager.swapBuffers();
     }

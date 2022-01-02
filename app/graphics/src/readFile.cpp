@@ -8,7 +8,7 @@
 #include <string>
 #include <cstring>
 
-Map readMap(std::string filename, const glimac::FilePath& applicationPath){
+std::pair<Map, geo::Joueur> readMap(std::string filename, const glimac::FilePath& applicationPath){
     Map newMap;
     std::ifstream infile(filename);
     if(!infile.is_open()){
@@ -20,6 +20,7 @@ Map readMap(std::string filename, const glimac::FilePath& applicationPath){
     infile >> newMap.height;
     glm::vec2 positionTile = glm::vec2(0.,0.);
     const auto directionTile = glm::vec2(1.,0.);
+    glm::vec2 posJoueur;
     for (std::string line; std::getline(infile, line);)
     {
         for (size_t i = 0; i < line.size(); i++)
@@ -29,12 +30,13 @@ Map readMap(std::string filename, const glimac::FilePath& applicationPath){
             switch (c)
             {
                 case 'W':
-                    newMap.tiles.push_back(std::make_unique<Wall>(positionTile + static_cast<float>(i) * directionLine, applicationPath)); //Remplacer par un mur
+                    newMap.tiles.push_back(std::make_unique<Wall>(positionTile + static_cast<float>(i) * directionLine, applicationPath)); 
                     break;
                 case 'T':
                     newMap.tiles.push_back(std::make_unique<Tile>(positionTile + static_cast<float>(i) * directionLine, applicationPath));
                     break;
                 case 'P':
+                    posJoueur = positionTile + static_cast<float>(i) * directionLine;
                     newMap.tiles.push_back(std::make_unique<Tile>(positionTile + static_cast<float>(i) * directionLine, applicationPath));
                     break;
                 case 'L':
@@ -51,5 +53,6 @@ Map readMap(std::string filename, const glimac::FilePath& applicationPath){
         }
         positionTile += directionTile;
     } 
-    return newMap;
+    geo::Joueur J1(posJoueur);
+    return std::make_pair(std::move(newMap),std::move(J1));
 }

@@ -2,10 +2,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <tuple>
 #include <glimac/FilePath.hpp>
 #include <graphics/case.hpp>
 #include <graphics/tile.hpp>
 #include <graphics/wall.hpp>
+#include <geometry/joueur.hpp>
 
 
 struct Map
@@ -15,4 +17,4 @@ struct Map
     std::vector<std::unique_ptr<Case>> tiles;
 };
 
-Map readMap(std::string filename, const glimac::FilePath& applicationPath);
+std::pair<Map, geo::Joueur> readMap(std::string filename, const glimac::FilePath& applicationPath);

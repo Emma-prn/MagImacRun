@@ -43,8 +43,7 @@ Tile::~Tile(){};
 void Tile::draw(glm::mat4 view, glm::mat4 proj) {
     tileProgram.m_Program.use();
     const auto tilePos = getPos();
-    auto pos2 = glm::scale(glm::mat4(1.f), glm::vec3(0.2, 0.2, 0.2));
-    pos2 = glm::translate(pos2, glm::vec3(tilePos.x,0.f,tilePos.y));
+    auto pos2 = glm::translate(glm::mat4(1.f), glm::vec3(tilePos.x,0.f,tilePos.y));
     glUniformMatrix4fv(tileProgram.uVMatrix, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(tileProgram.uPMatrix, 1, GL_FALSE, glm::value_ptr(proj));
     glUniformMatrix4fv(tileProgram.uPos, 1, GL_FALSE, glm::value_ptr(pos2));

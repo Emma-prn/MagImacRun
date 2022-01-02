@@ -4,7 +4,9 @@
 #include <vector>
 #include "stb_image.h"
 
-Skybox::Skybox(){
+Skybox::Skybox(const glimac::FilePath& applicationPath)
+    :skyboxProgram(applicationPath)
+{
     float skyboxVertices[] = {
         -1.0f, -1.0f, 1.0f,
         1.0f, -1.0f, 1.0f,
@@ -46,12 +48,12 @@ Skybox::Skybox(){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
 
     std::string facesCubeMap[6] = {
-        "../assets/textures/sky/test/posx.png",
-        "../assets/textures/sky/test/negx.png",
-        "../assets/textures/sky/test/posy.png",
-        "../assets/textures/sky/test/negy.png",
-        "../assets/textures/sky/test/posz.png",
-        "../assets/textures/sky/test/negz.png"
+        "../assets/textures/sky/posx.jpg",
+        "../assets/textures/sky/negx.jpg",
+        "../assets/textures/sky/posy.jpg",
+        "../assets/textures/sky/negy.jpg",
+        "../assets/textures/sky/posz.jpg",
+        "../assets/textures/sky/negz.jpg"
     };
 
     glGenTextures(1,&cubeMapText);
@@ -80,12 +82,15 @@ Skybox::Skybox(){
     }
 };
 
-void Skybox::renderSkybox(){
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapText);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+void Skybox::renderSkybox(glm::mat4 view, glm::mat4 proj){
+    skyboxProgram.m_Program.use();
+    glUniformMatrix4fv(skyboxProgram.uVMatrix, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(skyboxProgram.uPMatrix, 1, GL_FALSE, glm::value_ptr(proj));
+    glBindVertexArray(skyboxVAO);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapText);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 Skybox::~Skybox(){};

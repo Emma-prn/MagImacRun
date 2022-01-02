@@ -1,12 +1,13 @@
 #pragma once
 #include <glimac/glm.hpp>
+#include <geometry/joueur.hpp>
 
-class cameraA
+class CamA
 {
 private:
     
 public:
-    virtual void panVar(float variationPan);
-    virtual void tiltVar(float variationTilt);
-    virtual glm::mat4 getView(glm::vec3 PlayerPos);
+    virtual void rotateLeft(float degrees) = 0;
+    virtual void rotateUp(float degrees) = 0;
+    virtual glm::mat4 getViewMatrix(geo::Joueur joueur) const = 0;
 };

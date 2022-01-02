@@ -70,8 +70,7 @@ Wall::Wall(glm::vec2 tPos, const glimac::FilePath& applicationPath)
 void Wall::draw(glm::mat4 view, glm::mat4 proj){
         wallProgram.m_Program.use();
         const auto wallPos = getPos();
-        auto pos2 = glm::scale(glm::mat4(1.f), glm::vec3(0.2, 0.2, 0.2));
-        pos2 = glm::translate(pos2, glm::vec3(wallPos.x,0.f,wallPos.y));
+        auto pos2 = glm::translate(glm::mat4(1.f), glm::vec3(wallPos.x,0.f,wallPos.y));
         glUniformMatrix4fv(wallProgram.uVMatrix, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(wallProgram.uPMatrix, 1, GL_FALSE, glm::value_ptr(proj));
         glUniformMatrix4fv(wallProgram.uPos, 1, GL_FALSE, glm::value_ptr(pos2));
