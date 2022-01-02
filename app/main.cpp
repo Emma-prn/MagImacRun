@@ -13,6 +13,30 @@
 
 using namespace glimac;
 
+struct Vertex2DColor{
+
+    public:
+        glm::vec2 position;
+        glm::vec3 color;
+
+        Vertex2DColor(glm::vec2 position, glm::vec3 color);
+        Vertex2DColor();
+};
+
+Vertex2DColor::Vertex2DColor(glm::vec2 position, glm::vec3 color){
+
+    this-> position = position;
+
+    this->color = color;
+};
+
+Vertex2DColor::Vertex2DColor(){
+ 
+    this->position = glm::vec2(0.0f,0.0f);
+
+    this->color = glm::vec3(0.0f,0.0f,0.0f);
+}
+
 float width = 800;
 float height = 600;
 bool isBlocked = false;
@@ -41,7 +65,7 @@ int main(int argc, char** argv) {
     CamFPers cam(mapAndJ.second);
     CamTPers camT;
     CamA* camP = &camT;
-    Crystal cristal(1, 32, 16,applicationPath); 
+    //Crystal cristal(1, 32, 16,applicationPath); 
 
     // Application loop:
     bool done = false;
