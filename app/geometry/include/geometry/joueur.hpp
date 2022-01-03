@@ -7,6 +7,7 @@ namespace geo {
     {
     private:
         spatial_object posOriJoueur;
+        glm::vec2 direction;
     public:
         Joueur(glm::vec2 joueurOrigin);
         ~Joueur();
