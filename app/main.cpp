@@ -10,6 +10,10 @@
 #include <glimac/Skybox.hpp>
 #include <graphics/readFile.hpp>
 #include <graphics/crystal.hpp> 
+#include <glimac/Texture.hpp>
+#include <graphics/Objet.hpp>
+#include <graphics/Rectangle.hpp>
+#include <graphics/Dessin.hpp>
 
 using namespace glimac;
 
@@ -66,7 +70,12 @@ int main(int argc, char** argv) {
     CamTPers camT;
     CamA* camP = &camT;
     //Crystal cristal(1, 32, 16,applicationPath); 
+    Texture menuTexture(applicationPath, "forest.jpg");
+    Rectangle menu(10, 5);
 
+    Dessin menuProgram(applicationPath, "projet.vs.glsl", "projet.fs.glsl", menu);
+
+    bool pause = false
     // Application loop:
     bool done = false;
     while(!done) {
@@ -102,6 +111,14 @@ int main(int argc, char** argv) {
                                 }
                             }
                             break;
+                        case SDLK_ESCAPE:
+                            if(pause == false){
+                                pause = true;
+                            }
+                            else{
+                                pause = false;
+                            }
+
                         default:
                             break;
                     }
@@ -149,6 +166,15 @@ int main(int argc, char** argv) {
         //cristal.crystalDraw(View, Projection, windowManager);
         glDepthFunc(GL_LESS);
         // Update the display
+
+        glm::mat4 menuMVMatrix;
+        menuMVMatrix = glm::translate(globalMVMatrix, glm::vec3(0, 1, 0));
+        menuMVMatrix = glm::rotate(globalMVMatrix, 90.0f, glm::vec3(1, 0, 0));
+        
+        if (pause == true){
+            menuProgram.draw(menuTexture, menuMVMatrix, projMatrix);
+        }
+
         windowManager.swapBuffers();
     }
     return EXIT_SUCCESS;
