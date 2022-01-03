@@ -46,8 +46,9 @@ private:
     GLuint crystalVBO;
     GLuint crystalText;
     CrystalProgram crystalProgram;
+    glm::vec2 crystalPos;
 public:
-    Crystal(GLfloat radius, GLsizei discLat, GLsizei discLong, const glimac::FilePath& applicationPath);
+    Crystal(GLfloat radius, GLsizei discLat, GLsizei discLong, glm::vec2 position, const glimac::FilePath& applicationPath);
 
     // Renvoit le pointeur vers les données
     const ShapeVertex* getDataPointer() const {
@@ -59,5 +60,5 @@ public:
         return m_nVertexCount;
     }
 
-    void crystalDraw(glm::mat4 view, glm::mat4 proj, glimac::SDLWindowManager windowManager);
+    void crystalDraw(glm::mat4 view, glm::mat4 proj, glimac::SDLWindowManager &windowManager);
 };

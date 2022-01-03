@@ -14,7 +14,11 @@ namespace geo {
         void turnLeft();
         void move();
         void jump();
+        void land();
         void slide();
+        void standUp();
+        void fall();
+        bool isJumping();
         glm::mat4 getPosJou();
     };
 }

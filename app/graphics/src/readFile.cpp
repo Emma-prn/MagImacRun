@@ -8,6 +8,23 @@
 #include <string>
 #include <cstring>
 
+float length(glm::vec2 v){
+    return std::max(std::abs(v.x),std::abs(v.y));
+}
+
+bool Map::isAlive(geo::Joueur joueur) {
+    glm::vec4 posJouCol = glm::column(joueur.getPosJou(),3);
+    glm::vec2 posJou = glm::vec2(posJouCol.x, posJouCol.z);
+    for (size_t i = 0; i < tiles.size(); i++)
+    {
+        if (length(tiles[i]->getPos()- posJou) < 0.5 )
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::pair<Map, geo::Joueur> readMap(std::string filename, const glimac::FilePath& applicationPath){
     Map newMap;
     std::ifstream infile(filename);
@@ -34,6 +51,7 @@ std::pair<Map, geo::Joueur> readMap(std::string filename, const glimac::FilePath
                     break;
                 case 'T':
                     newMap.tiles.push_back(std::make_unique<Tile>(positionTile + static_cast<float>(i) * directionLine, applicationPath));
+                    newMap.crystals.push_back(std::make_unique<Crystal>(1, 32, 16,positionTile + static_cast<float>(i) * directionLine, applicationPath));
                     break;
                 case 'P':
                     posJoueur = positionTile + static_cast<float>(i) * directionLine;
@@ -55,4 +73,4 @@ std::pair<Map, geo::Joueur> readMap(std::string filename, const glimac::FilePath
     } 
     geo::Joueur J1(posJoueur);
     return std::make_pair(std::move(newMap),std::move(J1));
-}
+};

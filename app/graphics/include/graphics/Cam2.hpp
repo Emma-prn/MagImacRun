@@ -63,5 +63,9 @@ public:
 
     float getLeft(){return m_fPhi;};
     float getUp(){return m_fTheta;};
-    glm::mat4 getViewMatrix(geo::Joueur joueur) const {return glm::lookAt(m_Position,m_Position+m_FrontVector,m_UpVector);};
+    glm::mat4 getViewMatrix(geo::Joueur joueur) const {
+        glm::vec4 posJouCol = glm::column(joueur.getPosJou(),3);
+        glm::vec3 posJou = glm::vec3(posJouCol.x, posJouCol.y+1, posJouCol.z);
+        return glm::lookAt(posJou,posJou+m_FrontVector,m_UpVector);
+    };
 };

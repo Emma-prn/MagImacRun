@@ -5,8 +5,8 @@
 #include <iostream>
 #include <GL/gl.h>
 
-Crystal::Crystal(GLfloat radius, GLsizei discLat, GLsizei discLong, const glimac::FilePath& applicationPath)
-    :m_nVertexCount(0), crystalProgram(applicationPath) {
+Crystal::Crystal(GLfloat radius, GLsizei discLat, GLsizei discLong, glm::vec2 position, const glimac::FilePath& applicationPath)
+    :m_nVertexCount(0), crystalProgram(applicationPath), crystalPos(position) {
         build(radius, discLat, discLong);
         glGenBuffers(1,&crystalVBO);
         glBindBuffer(GL_ARRAY_BUFFER,crystalVBO);
@@ -72,7 +72,7 @@ void Crystal::build(GLfloat r, GLsizei discLat, GLsizei discLong) {
     }
 }
 
-void Crystal::crystalDraw(glm::mat4 view, glm::mat4 proj, glimac::SDLWindowManager windowManager){
+void Crystal::crystalDraw(glm::mat4 view, glm::mat4 proj, glimac::SDLWindowManager &windowManager){
     crystalProgram.m_Program.use();
     glm::vec3 lightColor = glm::vec3(1.f,1.f,1.f);
     glm::vec3 lightPos = glm::vec3(0.5f,0.5f,0.5f);

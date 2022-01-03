@@ -9,7 +9,6 @@
 #include <utility>
 #include <glimac/Skybox.hpp>
 #include <graphics/readFile.hpp>
-#include <graphics/crystal.hpp> 
 
 using namespace glimac;
 
@@ -41,7 +40,6 @@ int main(int argc, char** argv) {
     CamFPers cam(mapAndJ.second);
     CamTPers camT;
     CamA* camP = &camT;
-    Crystal cristal(1, 32, 16,applicationPath); 
 
     // Application loop:
     bool done = false;
@@ -54,15 +52,31 @@ int main(int argc, char** argv) {
             }
             switch (e.type)
             {
+                case SDL_KEYUP:
+                    switch (e.key.keysym.sym) {
+                        case SDLK_z:
+                            mapAndJ.second.land();
+                            break;
+                        case SDLK_s:
+                            mapAndJ.second.standUp();
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
                 case SDL_KEYDOWN:
                     switch (e.key.keysym.sym) {
                         case SDLK_z:
+                            mapAndJ.second.jump();
                             break;
                         case SDLK_s:
+                            mapAndJ.second.slide();
                             break;
                         case SDLK_q:
+                            mapAndJ.second.turnLeft();
                             break;
                         case SDLK_d:
+                            mapAndJ.second.turnRight();
                             break;
                         case SDLK_l:
                             isBlocked = !isBlocked;
@@ -120,9 +134,14 @@ int main(int argc, char** argv) {
         for (float i = 0; i < mapAndJ.first.tiles.size(); i++)
         {
             mapAndJ.first.tiles[i]->draw(camP->getViewMatrix(mapAndJ.second), Projection);
+            //mapAndJ.first.crystals[i]->crystalDraw(camP->getViewMatrix(mapAndJ.second), Projection, windowManager);
         }
-        //mapAndJ.second.move();
-        //cristal.crystalDraw(View, Projection, windowManager);
+        mapAndJ.second.move();
+        if(!mapAndJ.first.isAlive(mapAndJ.second)){
+            if(!mapAndJ.second.isJumping()){
+                mapAndJ.second.fall();
+            }
+        }
         glDepthFunc(GL_LESS);
         // Update the display
         windowManager.swapBuffers();

@@ -51,6 +51,6 @@ public:
     glm::mat4 getViewMatrix(geo::Joueur joueur) const {
         glm::vec4 posJouCol = glm::column(joueur.getPosJou(),3);
         glm::vec3 posJou = glm::vec3(posJouCol.x, posJouCol.y, posJouCol.z);
-        return glm::lookAt(m_Position,posJou,glm::vec3(0.,1.,0.));
+        return glm::lookAt(m_Position+posJou,posJou,glm::vec3(0.,1.,0.));
     };
 };
